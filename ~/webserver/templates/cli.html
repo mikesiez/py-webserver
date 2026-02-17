@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Server CLI</title>
+<style>
+  body {
+    background-color: #0d0d0d;
+    color: #00ff66;
+    font-family: monospace;
+    margin: 0;
+    padding: 0;
+  }
+  #terminal {
+    padding: 10px;
+    height: 90vh;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+  #input-line {
+    display: flex;
+    background-color: #111;
+    border-top: 1px solid #222;
+    padding: 8px;
+  }
+  #prompt {
+    color: #00ff66;
+  }
+  #cmd {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #00ff66;
+    font-family: monospace;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+<div id="terminal">
+  <div>Welcome to <b>micha-server</b> CLI.</div>
+  <div>Type a command below.</div>
+  <div>--------------------------------------------</div>
+</div>
+<div id="input-line">
+  <span id="prompt">micha-server$&nbsp;</span>
+  <input id="cmd" type="text" autofocus autocomplete="off" />
+</div>
+
+<script>
+const terminal = document.getElementById('terminal');
+const input = document.getElementById('cmd');
+
+input.addEventListener('keydown', async (e) => {
+  if (e.key === 'Enter') {
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    appendOutput(`\n$ ${cmd}`);
+    input.value = '';
+
+    const res = await fetch('/cli/run', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({cmd})
+    });
+    const data = await res.json();
+    appendOutput(data.output || "(no output)");
+  }
+});
+
+function appendOutput(text) {
+  terminal.innerText += `\n${text}`;
+  terminal.scrollTop = terminal.scrollHeight;
+}
+</script>
+</body>
+</html>

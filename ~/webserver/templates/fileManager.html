@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+    <title>Shared Files Manager</title>
+    <style>
+        * {
+            font-family: 'Courier New', Courier, monospace;
+            transition: color 0.15s ease, transform 0.1s ease, background 0.2s ease;
+            color: white;
+        }
+        html {
+            background-color: black;
+        }
+        div {
+            border: solid 1px lime;
+            border-radius: 10px;
+            width: 70%;
+            padding: 1%;
+            margin-left: 3%;
+            font-size: 2vw;
+        }
+        h2 {
+            font-style: italic;
+            font-size: 1.3em;
+            color: lime;
+            padding-left: 2%;
+        }
+        #welcome {
+            font-size: 150%;
+            color: green;
+        }
+        #topSeperator {
+            border-color: green;
+            width: 90%;
+        }
+        a {
+            font-size: 1em;
+            color: lime;
+            display: inline-block;
+        }
+        a:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+        table * {
+            color:lime;
+        }
+        button {
+            cursor:pointer;
+            background-color: darkred;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        #delete {
+            margin-left: 2%;
+            border: 1px solid red;
+        }
+        #deleteB {
+            margin-left: 10px;
+            border: 1px solid red;
+            font-size: 1em;
+            padding: 5.5px;
+            vertical-align: middle;
+        }
+        #delete:hover {
+            background-color: white;
+            transform: scale(1.1);
+        }
+        #deleteB:hover {
+            background-color: red;
+            border-color: white;
+            transform: scale(1.1);
+        }
+        label {
+            cursor: pointer;
+            border: 1px solid white;
+            border-radius: 5px;
+            color: white;
+            background: rgb(30, 30, 30);
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            padding: 5px;
+            gap: 5px;
+        }
+        label:hover {
+            background: rgb(42, 42, 42);
+            transform: scale(1.1);
+        }
+        form.uploadForm {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    {{global_html['header']|safe}}
+<h2 id="welcome">> WELCOME, {{user}}</h2>
+<hr id="topSeperator">
+<p style="padding-left: 2%; color: cyan; font-size: 120%;">Last updated: {{last_updated_info}}</p><br/>
+
+<div>
+<h2>{{location}}</h2>
+{% for key, value in files.items() %}
+
+{% if key != "../" %}
+<form class="deleteForm" action="/shared/delete" method="POST" style="display:none;;">
+    <input type="hidden" name="target" value="{{ value['filepath'][8:] }}"> <!-- strip /shared/ -->
+    <button type="submit" id="delete">❌</button>
+</form>
+{% endif %}
+<a style="margin-left:5%;" href="{{value['filepath']}}">{{key}}{{value['size']}}</a><br/>
+
+{% endfor %}
+<br/>
+</div><br/>
+
+<form action="/shared/upload" method="POST" enctype="multipart/form-data" class="uploadForm" style="margin-left: 5%;">
+    <input type="hidden" name="cwd" value="{{cwd}}">
+    <label style="margin-left: 5px;" id="fileUpd">| UPLOAD FILE(S) 
+        <input hidden type="file" name="files" id="fileInput" multiple onchange="this.form.submit()">
+    </label>
+    <label id="folderUpd"> UPLOAD FOLDER |
+        <input hidden type="file" name="files" id="folderInput" webkitdirectory onchange="this.form.submit()">
+    </label>
+</form>
+<button id="deleteB">|  ENABLE DELETION |</button>
+
+</body>
+{{ alert_script|safe }}
+<script>
+    const toggleButton = document.getElementById('deleteB');
+    const deleteForms = document.querySelectorAll('.deleteForm');
+    let enabled = false;
+
+    toggleButton.addEventListener('click', () => {
+        enabled = !enabled;
+        deleteForms.forEach(f => f.style.display = enabled ? 'inline' : 'none');
+        toggleButton.textContent = enabled ? '|  DISABLE DELETION |' : '|  ENABLE DELETION |';
+    });
+</script>
+</html>

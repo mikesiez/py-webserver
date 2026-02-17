@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Minecraft Server Control</title>
+  <style>
+    * {
+        transition: color 0.15s ease, transform 0.2s ease, background 0.2s ease;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+    }
+    #banner {
+        top: 120px;
+        left: 420px;
+        width: calc(100vw - 460px);  /* full width minus left+right margins */
+        height: 20vh;
+        justify-self: right;
+        background-size: contain;
+        position: absolute;
+        z-index: -1;
+        opacity: 0.3;
+        border: 2px solid white;
+        border-radius: 20px;
+    }
+    body { font-family: sans-serif; margin: 20px; background: #111; color: #eee; }
+    #logs { white-space: pre-wrap; 
+        background: #222;
+        padding: 10px; height: 400px; overflow-y: scroll; border-radius: 6px; }
+    button { margin: 5px; padding: 8px 14px; background: #444; color: white; border: 1px solid white; border-radius: 4px; cursor: pointer; }
+    #resetB {background:red;color:white}
+    #resetC {background:blue;color:white}
+    #resetB:hover {background: darkred;}
+    #resetC:hover {background: darkblue;}
+    button:hover { background: #666; }
+    #status { margin-top: 10px; font-weight: bold; }
+    #cmd { padding: 6px; border-radius: 4px; border: 1px solid white; background: #222; color: #eee; }
+  </style>
+</head>
+
+<img id="banner" src="https://i.imgur.com/VeEQ2N0.png" alt="Banner">
+<body>
+
+    <header style=" 
+    background: #1d1c1c; 
+    color: white; 
+    padding: 5px 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;">
+    <style>
+        #headerNav {
+            margin-left: auto;
+        }
+        #headerNav * {
+            border: 1px solid white; 
+            background:rgb(21, 21, 21); 
+            border-radius: 10px; 
+            padding: 5px 10px; 
+            font-size: 15px;
+            text-decoration: none;
+            margin-left: 5px;
+            color:white;
+            display: inline-block;
+            font-weight: bold;
+        }
+        #headerNav a:hover {
+            background: rgb(37, 37, 37);
+            transform: scale(1.05); 
+        }
+    </style>    
+    <h2 style="margin: 0;">micha-server</h2>
+            <nav id="headerNav">
+                <a href="/">Home</a>
+                <a href="/minecraft">Minecraft</a>
+                <a href="/logout">Logout</a>
+            </nav><br/>
+    </header><hr style="border: 1px solid green;">
+
+    
+
+<h2>Minecraft Server Dashboard</h2>
+
+<div>
+  <button onclick="sendAction('start')">Start</button>
+  <button onclick="sendAction('stop')">Stop</button>
+</div>
+
+<div style="margin-top: 10px;">
+  <input id="cmd" type="text" placeholder="Enter server command..." style="width:300px;">
+  <button onclick="sendAction('command')">Send</button>
+</div>
+
+<div id="status">Status: error contact tech support 😹</div>
+<h3>Server Logs</h3>
+<div id="logs"></div>
+<br/>
+<h4><i>Only use the following buttons if you know why you're using them</i></h4>
+{% if user == "MICHAEL" or user == "ATS10" %}
+  <button id="resetB" onclick="sendAction('reset')">⚠️ Reset state ⚠️</button>
+  <button id="resetC" onclick="rebootServer()">🔄️ Reboot computer 🔄️</button>
+{% endif %}
+
+
+<script>
+
+  const MINECRAFT_API = "/minecraft/action";
+  const STREAM_URL = "/minecraft/stream";
+  const MAX_LOGS = 200;
+
+  function setStatus(statusText) {
+    const statusDiv = document.getElementById("status");
+    if (!statusDiv) return;
+    statusDiv.textContent = `Status: ${statusText}`;
+  }
+
+  function appendLog(line) {
+    const logContainer = document.getElementById("logs");
+    
+    const div = document.createElement("div");
+    div.textContent = line;
+    logContainer.appendChild(div);
+
+    while (logContainer.children.length > MAX_LOGS) {
+      logContainer.removeChild(logContainer.firstChild);
+    }
+
+    logContainer.scrollTop = logContainer.scrollHeight;
+  }
+
+  async function sendAction(action) {
+    
+    let url = `${MINECRAFT_API}?action=${action}`;
+
+    if (action === "command") {
+      const cmdInput = document.getElementById("cmd");
+      const cmd = cmdInput.value.trim();
+      if (!cmd) return;
+      url += `&cmd=${encodeURIComponent(cmd)}`;
+      cmdInput.value = "";
+    }
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log("Response:", data);
+
+    } catch (err) {
+      console.error(`Failed to send ${action}:`, err);
+    }
+  }
+
+  async function checkStatus() {
+      try {
+          const response = await fetch(`${MINECRAFT_API}?action=status`);
+          const data = await response.json();
+          return data.status;
+
+      } catch (error) {
+          console.error("Error checking status:", error);
+          return "error";
+      }
+  }
+
+  async function rebootServer() {
+    const status = await checkStatus();
+    if (status !== "stopped") return "Server not stopped - reboot cancelled.";
+
+    try {
+      const r = await fetch("/reboot");
+      return await r.text();
+
+    } catch {
+      return 'Reboot failed. Contact tech support 😹.'
+    }
+  }
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const eventSource = new EventSource(STREAM_URL);
+
+    // Make sure status initializes properly
+    checkStatus().then(setStatus);
+
+    // Updated log event handler for batched logs
+    eventSource.addEventListener("log", e => {
+      const lines = e.data.split("\n");
+
+      for (const line of lines) {
+        if (line.trim()) appendLog(line);
+      }
+
+    });
+
+    eventSource.addEventListener("status", e => setStatus(e.data));
+
+    eventSource.onerror = e => {
+      console.error("SSE connection lost:", e);
+      setStatus("disconnected");
+    };
+
+    // Send command on Enter
+    document.getElementById("cmd").addEventListener("keydown", e => {
+      if (e.key === "Enter") sendAction("command");
+    });
+  });
+
+</script>
+
+
+</body>
+</html>

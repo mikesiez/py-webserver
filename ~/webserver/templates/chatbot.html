@@ -1,0 +1,67 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Virtual Girlfriend</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width:700px; margin:30px auto; }
+    #chat { border:1px solid #ddd; padding:10px; height:400px; overflow:auto; background:#fafafa; }
+    .msg { margin:8px 0; }
+    .user { text-align:right; }
+    .bot { text-align:left; }
+    .meta { font-size:11px; color:#666; }
+    #controls { margin-top:10px; display:flex; gap:8px; }
+    button { padding:8px 12px; }
+  </style>
+</head>
+<body>
+  <h2>{{ persona.name }} — virtual companion</h2>
+  <div id="chat"><div class="msg bot"><div class="meta">{{ persona.name }}</div><div>{{ persona.greeting }}</div></div></div>
+
+  <div id="controls">
+    <input id="input" style="flex:1;padding:8px" placeholder="Type a message" />
+    <button id="send">Send</button>
+    <label><input type="checkbox" id="tts"> TTS</label>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById("send");
+    const input = document.getElementById("input");
+    const chat = document.getElementById("chat");
+    const ttsBox = document.getElementById("tts");
+    const sessionId = "local_user";
+
+    function addMessage(text, who) {
+      const d = document.createElement("div");
+      d.className = "msg " + (who === "user" ? "user" : "bot");
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = who === "user" ? "You" : "{{ persona.name }}";
+      const body = document.createElement("div");
+      body.textContent = text;
+      d.appendChild(meta);
+      d.appendChild(body);
+      chat.appendChild(d);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      input.value = "";
+      const res = await fetch("/chatbot/chat", {
+        method: "POST",
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({session_id: sessionId, message: text, tts: ttsBox.checked})
+      });
+      const j = await res.json();
+      addMessage(j.reply, "bot");
+    }
+
+    sendBtn.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+  </script>
+</body>
+</html>
