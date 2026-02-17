@@ -1,0 +1,24 @@
+[Unit]
+Description=Gunicorn instance to serve Minecraft API
+After=network.target
+
+[Service]
+User=mike
+Group=mike
+WorkingDirectory=/home/mike/webserver
+Environment="PATH=/home/mike/webserver/server-venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Gunicorn with gevent for SSE streaming, single worker, no timeout
+ExecStart=/home/mike/webserver/server-venv/bin/gunicorn \
+          -k gevent \
+          --workers 1 \
+          --bind 127.0.0.1:5001 \
+          --timeout 0 \
+          minecraft:app
+
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
