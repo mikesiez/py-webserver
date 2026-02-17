@@ -6,5 +6,5 @@ sudo fail2ban-regex /home/mike/webserver/logs/auth.log /etc/fail2ban/filter.d/fl
 sudo fail2ban-client status
 sudo fail2ban-client status flask-auth
 
-####If someone triggers the jail:
+#### If someone triggers the jail:
 sudo fail2ban-client banned
