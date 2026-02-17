@@ -1,3 +1,6 @@
+# this one is a meme i did not make it.
+
+
 from flask import Flask, request, render_template, jsonify
 from pathlib import Path
 import random
@@ -124,3 +127,4 @@ def chat():
 def register_chatbot_routes(app):
 	app.add_url_rule('/chatbot', "chatbot_page", index, methods=['GET','POST'])
 	app.add_url_rule('/chatbot/chat', "chatbot_chat", chat, methods=['GET','POST'])
+
