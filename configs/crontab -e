@@ -1,0 +1,5 @@
+*/2 * * * * /home/mike/update.sh >> /home/mike/update.log 2>&1
+*/2 * * * * /home/mike/update.sh >/dev/null 2>&1
+*/5 * * * * ~/duck/duck.sh >/dev/null 2>&1
+*/10 * * * * find /home/mike/webserver/sessions -type f -mmin +60 -delete
+*/15 * * * * /home/mike/mcServers/autoBPs/runAutoBP.sh >/dev/null 2>&1
