@@ -3,3 +3,5 @@
 */5 * * * * ~/duck/duck.sh >/dev/null 2>&1
 */10 * * * * find /home/mike/webserver/sessions -type f -mmin +60 -delete
 */15 * * * * /home/mike/mcServers/autoBPs/runAutoBP.sh >/dev/null 2>&1
+
+# duck.sh makes sure duckdns domain still working.
