@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+      
+      * {
+        font-family: 'Courier New', Courier, monospace;
+        transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+      }
+
+      #matrix {
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      #gap {
+        margin-top: 10%;
+      }
+
+      #error {
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+        margin:3px;
+      }
+
+      body {
+        overflow: hidden;
+      }
+      
+      h2 {
+        color: lime;
+        font-size: 300%;
+        margin:10px;
+        text-align: center;
+      }
+      
+      #loginTitle {
+        -webkit-text-stroke: rgb(180, 178, 178) 1px;
+      }
+
+      #publicLink a  {
+        color:lime;
+      }
+      #publicLink a:hover {
+        color: white;
+      }
+      
+      h2:hover {
+        transform: scale(1.1);
+      }
+      
+
+      form {
+        width: 50%;
+        padding-top: 3%;
+        padding-bottom: 3%;
+        background-color: rgb(20, 20, 20);
+        border: 2px solid lime;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-self: center;
+      }
+
+      input {
+        width: 80%;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid lime;
+        font-size: 150%;
+        color: white;
+        background-color: transparent;
+        margin:1px;
+      }
+      input:last-child {
+        color: white;
+        font-weight: bold;
+      }
+      input:hover:last-child {
+        cursor: pointer;  
+        background-color: lime;
+        color: black;
+        font-weight: bold;
+        transform: scale(1.1);
+      }
+      input::placeholder {
+        transition: color 0.15s ease;
+      }
+      input:hover::placeholder {
+        color:white;
+      }
+
+    </style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div id="gap"></div>
+<h2 id="loginTitle">./login</h2>
+<form method="post">
+  <input type="text" name="username" autocomplete="username" placeholder=" username"><br/>
+  <input type="password" autocomplete="current-password" name="password" placeholder=" password"><br/>
+  <input type="submit" value="> ACCESS <">
+</form>
+{% if error %}
+<p id="error" style="color:red">{{ error }}</p>
+{% endif %}
+<div id="gap"></div>
+<h2 id="publicLink">
+  <a href="/public">public/</a>
+</h2>
+
+<script> /* javascript not mine */
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const letters = '01'; // can use any characters
+  const fontSize = 25;
+  const columns = canvas.width / fontSize;
+
+  const drops = Array(Math.floor(columns)).fill(1);
+
+  function draw() {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)'; // trail effect
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#008000';
+    ctx.font = fontSize + 'px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>
+
+</body>
+</html>
