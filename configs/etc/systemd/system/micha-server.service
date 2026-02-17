@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn instance to serve Flask app
+After=network.target
+
+[Service]
+User=mike
+Group=www-data
+WorkingDirectory=/home/mike/webserver
+Environment="PATH=/home/mike/webserver/server-venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/home/mike/webserver/server-venv/bin/gunicorn --workers 3 --bind 127.0.0.1:5000 app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
