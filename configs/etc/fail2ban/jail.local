@@ -1,0 +1,7 @@
+[flask-auth]
+enabled = true
+filter = flask-auth
+logpath = /home/mike/webserver/logs/auth.log
+maxretry = 5
+findtime = 10m
+bantime = 15m

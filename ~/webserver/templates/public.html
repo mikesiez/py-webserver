@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+    <title>Home</title>
+    <style>
+        * {
+            font-family: 'Courier New', Courier, monospace;
+            transition: color 0.15s ease, transform 0.1s ease;
+        }
+        html {
+            color: white;
+            background-color: black;
+        }
+        h2 {
+            font-style: italic;
+            font-size: 200%;
+            color: lime;
+            padding-left: 2%;
+            -webkit-text-stroke: white 0.2px;
+        }
+        a {
+            font-size: 150%;
+            padding-left: 3%;
+            color: lime;
+            display: inline-block;
+        }
+        p {
+            padding-left: 3%;
+        }
+        a:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+
+    </style>
+</head>
+<body>
+<h2>> WELCOME, {{user}}</h2>
+<a href="/login">./login</a>
+<p>more to come</p>
+</body>
+</html>

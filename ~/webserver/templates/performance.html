@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Performance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: lime;
+        }
+        table {
+            border-collapse: collapse;
+            margin: 40px auto;
+            width: 60%;
+            background: #1e1e1e;
+        }
+        th, td {
+            padding: 10px 15px;
+            border: 1px solid gray;
+            text-align: left;
+            -webkit-text-stroke: white 0.15px;
+        }
+        th {
+            background: #222;
+            color: lime;
+            font-style: italic;
+        }
+        caption {
+            -webkit-text-stroke: black 0.5px;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: lightgreen;
+            
+        }
+    </style>
+</head>
+<body>
+    {{global_html['header']|safe}}
+
+    <table>
+        <caption>Server Performance Stats</caption>
+        {% for key, value in stats.items() %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
