@@ -1,6 +1,6 @@
 # 🖥️ py-webserver
 
-A self-hosted personal web server running on a home machine, featuring a general-purpose website, a Minecraft server dashboard, and an integrated Discord bot — all secured behind nginx, HTTPS, and fail2ban.
+A self-hosted personal web server running on a home machine, featuring a general-purpose website, a Minecraft server dashboard, and an integrated Discord bot - all secured behind nginx, HTTPS, and fail2ban.
 
 ## Stack
 
@@ -80,7 +80,7 @@ Two separate Gunicorn instances run as systemd services:
 | `mike-server` | `app.py` | `5000` |
 | `mike-minecraft` | `minecraft.py` | `5001` |
 
-nginx routes `/minecraft` to port `5001` (with SSE support — buffering disabled) and everything else to port `5000`.
+nginx routes `/minecraft` to port `5001` (with SSE support - buffering disabled) and everything else to port `5000`.
 
 ## Cron Jobs
 
